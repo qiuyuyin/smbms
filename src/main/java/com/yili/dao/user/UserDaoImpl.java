@@ -3,14 +3,29 @@ package com.yili.dao.user;
 import com.mysql.cj.util.StringUtils;
 import com.yili.dao.BaseDao;
 import com.yili.pojo.User;
-import org.w3c.dom.ls.LSException;
-import org.w3c.dom.ls.LSInput;
+import com.yili.service.User.UserServiceImpl;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoImpl implements UserDao {
+
+    @Override
+    public int modifyUser(Connection connection, User user) throws Exception {
+        PreparedStatement pstm = null;
+        int flag = 0;
+        if(connection!=null){
+            String sql = "update smbms_user set userName=? " +
+                    ",gender=?,birthday=?,phone=?,address=?,userRole= ? ,modifyBy=?,modifyDate=? where id = ?";
+            Object[] params = {user.getUserName(),user.getGender(),user.getBirthday(),user.getPhone(),user.getAddress(),
+                    user.getUserRole(),user.getModifyBy(),user.getModifyDate(),user.getId()
+            };
+            flag = BaseDao.execute(connection, pstm, sql, params);
+            BaseDao.closeResource(null,pstm,null);
+        }
+        return flag;
+    }
 
     @Override
     public int getUserCount(Connection connection, String username, int userRole) throws Exception{
@@ -122,5 +137,68 @@ public class UserDaoImpl implements UserDao {
         }
 
         return user;
+    }
+
+    @Override
+    public User getUerById(Connection connection, int id) throws Exception {
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        User user = new User();
+        if(connection!=null){
+            String sql = "select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r where u.id=? and u.userRole = r.id";
+            Object[] params = {id};
+            rs = BaseDao.execute(connection, pstm, rs, sql, params);
+            if(rs.next()){
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUserCode(rs.getString("userCode"));
+                user.setUserName(rs.getString("userName"));
+                user.setUserPassword(rs.getString("userPassword"));
+                user.setGender(rs.getInt("gender"));
+                user.setBirthday(rs.getDate("birthday"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddress(rs.getString("address"));
+                user.setUserRole(rs.getInt("userRole"));
+                user.setCreatedBy(rs.getInt("createdBy"));
+                user.setCreationDate(rs.getTimestamp("creationDate"));
+                user.setModifyBy(rs.getInt("modifyBy"));
+                user.setModifyDate(rs.getTimestamp("modifyDate"));
+                user.setUserRoleName(rs.getString("userRoleName"));
+            }
+            BaseDao.closeResource(null,pstm,rs);
+        }
+        return user;
+    }
+
+    @Override
+    public int delUserById(Connection connection, int id) throws Exception {
+        PreparedStatement pstm = null;
+        int flag = 0;
+        if(connection!=null){
+            String sql = "delete from smbms_user where id=?";
+            Integer uid  = new Integer(id);
+            Object[] params = {uid};
+
+            flag = BaseDao.execute(connection, pstm, sql, params);
+            BaseDao.closeResource(null,pstm,null);
+        }
+        return flag;
+    }
+
+    @Override
+    public int addUser(Connection connection, User user) throws Exception {
+        PreparedStatement pstm = null;
+        int updateRows = 0;
+        if(null != connection){
+            String sql = "insert into smbms_user (userCode,userName,userPassword," +
+                    "userRole,gender,birthday,phone,address,creationDate,createdBy) " +
+                    "values(?,?,?,?,?,?,?,?,?,?)";
+            Object[] params = {user.getUserCode(),user.getUserName(),user.getUserPassword(),
+                    user.getUserRole(),user.getGender(),user.getBirthday(),
+                    user.getPhone(),user.getAddress(),user.getCreationDate(),user.getCreatedBy()};
+            updateRows = BaseDao.execute(connection, pstm, sql, params);
+            BaseDao.closeResource(null, pstm, null);
+        }
+        return updateRows;
     }
 }

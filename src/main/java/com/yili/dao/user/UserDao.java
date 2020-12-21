@@ -16,5 +16,13 @@ public interface UserDao {
     public int getUserCount(Connection connection,String username ,int userRole) throws Exception;
     //得到用户列表
     public List<User> getUserList(Connection connection, String userName , int userRole, int currentPage, int pageSize) throws Exception;
+    //修改用户信息
+    public int modifyUser(Connection connection,User user) throws Exception;
+    //通过id获得用户信息。
+    public User getUerById(Connection connection,int id) throws Exception;
+    //通过id删除用户
+    public int delUserById(Connection connection,int id) throws Exception;
+    //添加用户
+    public int addUser(Connection connection,User user) throws Exception;
 
 }

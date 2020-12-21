@@ -6,11 +6,15 @@ import com.yili.dao.user.UserDaoImpl;
 import com.yili.pojo.Role;
 import com.yili.pojo.User;
 import com.yili.service.Role.RoleServiceImpl;
+import com.yili.servlet.user.UserServlet;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.stream.FactoryConfigurationError;
+import java.awt.geom.FlatteningPathIterator;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class UserServiceImpl implements UserService{
@@ -89,13 +93,91 @@ public class UserServiceImpl implements UserService{
         return user;
     }
 
+    @Override
+    public boolean modifyUser(User user) {
+        Connection connection = null;
+        boolean flag = false;
+        try {
+            connection = BaseDao.getConnection();
+            if(userDao.modifyUser(connection,user)>0) flag = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection,null,null);
+        }
+        return flag;
+    }
+
+    @Override
+    public User getUerById(int id) {
+        Connection connection = null;
+        User user = null;
+        try {
+            connection = BaseDao.getConnection();
+            user= userDao.getUerById(connection, id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection,null,null);
+        }
+        return user;
+    }
+
+    @Override
+    public boolean delUserById(int id) {
+        Connection connection = null;
+        boolean flag = false;
+        try {
+            connection = BaseDao.getConnection();
+            if(userDao.delUserById(connection,id)>0){
+                flag = true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection,null,null);
+        }
+        return flag;
+    }
+
+    @Override
+    public User userExist(String userCode) {
+        Connection connection = null;
+        User user = null;
+        try {
+            connection = BaseDao.getConnection();
+            user = userDao.getLoginUser(connection, userCode);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection,null,null);
+        }
+        return user;
+    }
+
+    @Override
+    public boolean addUser(User user) {
+        Connection connection = null;
+        boolean flag = false;
+        try {
+            connection = BaseDao.getConnection();
+            if(userDao.addUser(connection, user)>0){
+                flag = true;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection,null,null);
+        }
+        return flag;
+    }
+
     @Test
     public void test(){
         UserServiceImpl userService = new UserServiceImpl();
-        List<User> userList = userService.getUserList(null, 0, 1, 5);
-        for (User user : userList) {
-            System.out.println("UserName:"+user.getUserName());
-        }
+        boolean b = userService.delUserById(16);
+        System.out.println(b);
     }
 
 
