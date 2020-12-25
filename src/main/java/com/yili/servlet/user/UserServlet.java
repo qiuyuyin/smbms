@@ -180,7 +180,7 @@ public class UserServlet extends HttpServlet {
         if (userService.modifyUser(user)) {
             resp.sendRedirect(req.getContextPath() + "/jsp/user.do?method=query");
         } else {
-            req.getRequestDispatcher("usermodify.jsp").forward(req, resp);
+            req.getRequestDispatcher(req.getContextPath()+"/jsp/usermodify.jsp").forward(req, resp);
         }
     }
 
